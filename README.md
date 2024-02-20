@@ -46,3 +46,7 @@ module "everyday_stop" {
     })
 }
 ```
+
+## Cost
+
+Billable resources in this solution include [Amazon EventBridge Scheduler](https://aws.amazon.com/eventbridge/pricing/) and [AWS Lambda function](https://aws.amazon.com/lambda/pricing/) invocations. Both of which are covered under the "Always Free Tier". Please visit the relevant product pricing pages for more details.
