@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.16"
+      version = "~> 5.32"
     }
   }
 
@@ -26,8 +26,8 @@ resource "aws_iam_role_policy" "scheduler_execution_policy" {
                     "lambda:InvokeFunction"
                 ]
                 Resource: [
-                    "${aws_lambda_function.start-stop-instances.arn}:*",
-                    "${aws_lambda_function.start-stop-instances.arn}"
+                    "${module.start-stop-instances.lambda_function_arn}:*",
+                    "${module.start-stop-instances.lambda_function_arn}"
                 ]
             },
         ]
@@ -92,11 +92,16 @@ resource "aws_iam_role" "scheduler_lambda_role" {
   })
 }
 
-resource "aws_lambda_function" "start-stop-instances" {
-    filename = "./python/StartStopInstances.zip"
-    function_name = "start-stop-instances"
-    role = aws_iam_role.scheduler_lambda_role.arn
-    runtime = "python3.10"
-    handler = "StartStopInstances.lambda_handler"
-    timeout = 10
+module "start-stop-instances" {
+  source = "terraform-aws-modules/lambda/aws"
+
+  function_name = "start-stop-instances"
+  handler = "StartStopInstances.lambda_handler"
+  runtime = "python3.11"
+  timeout = 10
+
+  create_role = false
+  lambda_role = aws_iam_role.scheduler_lambda_role.arn
+
+  source_path = "./python"
 }

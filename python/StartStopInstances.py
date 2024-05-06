@@ -27,12 +27,13 @@ def lambda_handler(event, context):
         for instance in reservation["Instances"]:
             instances.append(instance["InstanceId"])
 
-    if instance_start:
+    if instance_start and instances:
         r = ec2.start_instances(InstanceIds=instances)
-    else:
+    elif instances:
         r = ec2.stop_instances(InstanceIds=instances)
+    else:
+        print(f"No instances found with tag name: '{instance_tag_name}' and tag value: '{instance_tag_value}' that is {instance_state}")
 
-    print(r)
     return {
         'statusCode': 200,
         'body': json.dumps(r)
